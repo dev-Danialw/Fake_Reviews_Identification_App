@@ -49,7 +49,6 @@ const Home = ({ navigation }) => {
       const response = await axios.post("http://192.168.10.5:5000/analyze", {
         url: searchBarValue,
       });
-      c;
 
       setIsLoading(false);
 

@@ -1,3 +1,4 @@
+const os = require("os");
 const jsonServer = require("json-server");
 const server = jsonServer.create();
 const router = jsonServer.router("db.json");
@@ -47,8 +48,29 @@ server.post("/analyze", (req, res) => {
 server.use(middlewares);
 server.use(router);
 
-const IP_ADDRESS = "192.168.10.5"; // Replace with your actual local IP address
-const PORT = 3001;
+const networkInterfaces = os.networkInterfaces();
+let IP_ADDRESS = "";
+
+// Loop through network interfaces to find a suitable IPv4 address
+for (const interfaceName in networkInterfaces) {
+  const interfaceArray = networkInterfaces[interfaceName];
+  for (const interfaceDetail of interfaceArray) {
+    if (interfaceDetail.family === "IPv4" && !interfaceDetail.internal) {
+      IP_ADDRESS = interfaceDetail.address;
+      break;
+    }
+  }
+  if (IP_ADDRESS) {
+    break;
+  }
+}
+
+if (!IP_ADDRESS) {
+  console.error("Unable to determine the local IP address.");
+  process.exit(1);
+}
+
+const PORT = 5000;
 
 server.listen(PORT, IP_ADDRESS, () => {
   console.log(`JSON Server is running at http://${IP_ADDRESS}:${PORT}`);
